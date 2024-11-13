@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Security+ 701 Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #007bff;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 5px solid #007bff;
+            border-radius: 4px;
+        }
+
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .option {
+            background: #f1f1f1;
+            padding: 12px 20px;
+            margin: 10px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s, border 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: #e2e6ea;
+        }
+
+        .option.selected {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            transition: background 0.3s;
+        }
+
+        .btn-submit { background: #28a745; }
+        .btn-submit:hover { background: #218838; }
+
+        .btn-next { background: #007bff; }
+        .btn-next:hover { background: #0069d9; }
+
+        .btn-show-trick { background: #ffc107; color: #212529; }
+        .btn-show-trick:hover { background: #e0a800; }
+
+        .btn-restart { background: #17a2b8; }
+        .btn-restart:hover { background: #138496; }
+
+        .memory-trick {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            border-radius: 4px;
+            display: none;
+            font-style: italic;
+        }
+
+        .result {
+            text-align: center;
+            display: none;
+        }
+
+        .result h2 {
+            margin-bottom: 10px;
+        }
+
+        .result p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .buttons {
+                flex-direction: column;
+            }
+
+            .buttons .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .buttons .btn:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="progress-text" id="progress-text">Question 1 of 35</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="question" id="question">Question text</div>
+            <ul class="options" id="options">
+                <!-- Options will be inserted here -->
+            </ul>
+            <div class="buttons">
+                <button id="submit" class="btn btn-submit">Submit Answer</button>
+                <button id="next" class="btn btn-next" style="display:none">Next Question</button>
+                <button id="showTrick" class="btn btn-show-trick" style="display:none">Show Memory Trick</button>
+            </div>
+            <div id="memoryTrick" class="memory-trick"></div>
+        </div>
+        <div id="result" class="result">
+            <h2>Quiz Complete!</h2>
+            <p id="score">Your Score: 0/35 (0%)</p>
+            <p id="highScore">Highest Score: 0/35 (0%)</p>
+            <button id="restart" class="btn btn-restart">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the primary purpose of a firewall?",
+                options: [
+                    "Encrypting data in transit",
+                    "Preventing unauthorized access",
+                    "Backing up data",
+                    "Monitoring employee activity"
+                ],
+                correct: 1,
+                trick: "Think of a firewall as a security guard - it controls who gets in and out! 🛡️"
+            },
+            {
+                question: "Which protocol is commonly used for secure web browsing?",
+                options: [
+                    "HTTP",
+                    "FTP",
+                    "SSH",
+                    "HTTPS"
+                ],
+                correct: 3,
+                trick: "HTTPS = HTTP + Security! 🔒"
+            },
+            {
+                question: "What does the principle of least privilege entail?",
+                options: [
+                    "Users should have no access to any resources",
+                    "Users should have only the minimum access necessary",
+                    "Users should have full administrative rights",
+                    "Users should share passwords to simplify access"
+                ],
+                correct: 1,
+                trick: "Least privilege means giving users 'just enough' access. Remember the phrase 'Less is best.'"
+            },
+            {
+                question: "Which type of attack involves overwhelming a system with traffic?",
+                options: [
+                    "Phishing",
+                    "Man-in-the-middle",
+                    "Denial-of-Service",
+                    "SQL Injection"
+                ],
+                correct: 2,
+                trick: "DoS stands for Denial-of-Service, which 'denies' access by overwhelming systems."
+            },
+            {
+                question: "What is multi-factor authentication?",
+                options: [
+                    "Using multiple usernames",
+                    "Using more than one method of authentication",
+                    "Using multiple passwords",
+                    "Using biometric data only"
+                ],
+                correct: 1,
+                trick: "Multi-factor means 'many factors.' It requires more than one method to verify identity."
+            },
+            {
+                question: "Which of the following is a symmetric encryption algorithm?",
+                options: [
+                    "RSA",
+                    "AES",
+                    "ECC",
+                    "Diffie-Hellman"
+                ],
+                correct: 1,
+                trick: "AES stands for Advanced Encryption Standard and is a symmetric algorithm."
+            },
+            {
+                question: "What is the purpose of intrusion detection systems (IDS)?",
+                options: [
+                    "To prevent unauthorized access",
+                    "To detect and alert on suspicious activities",
+                    "To encrypt data",
+                    "To manage user permissions"
+                ],
+                correct: 1,
+                trick: "IDS stands for Intrusion Detection System – it detects and alerts on suspicious activities."
+            },
+            {
+                question: "Which security model ensures that information is only accessible to those with authorization?",
+                options: [
+                    "Confidentiality",
+                    "Integrity",
+                    "Availability",
+                    "Non-repudiation"
+                ],
+                correct: 0,
+                trick: "Confidentiality ensures information is accessible only to authorized individuals."
+            },
+            {
+                question: "What does VPN stand for and what is its primary use?",
+                options: [
+                    "Virtual Private Network - Securing remote connections",
+                    "Virtual Public Network - Sharing public data",
+                    "Verified Private Network - Authenticating users",
+                    "Variable Private Network - Dynamic IP assignment"
+                ],
+                correct: 0,
+                trick: "VPN stands for Virtual Private Network, primarily used to secure remote connections."
+            },
+            {
+                question: "Which of the following is a best practice for creating strong passwords?",
+                options: [
+                    "Using personal information like birthdays",
+                    "Using at least 12 characters with a mix of letters, numbers, and symbols",
+                    "Using simple and easy-to-remember words",
+                    "Reusing passwords across multiple sites"
+                ],
+                correct: 1,
+                trick: "Strong passwords use a mix of characters and are at least 12 characters long."
+            },
+            {
+                question: "What is the main function of a Security Information and Event Management (SIEM) system?",
+                options: [
+                    "To manage user identities",
+                    "To analyze and correlate security events",
+                    "To encrypt sensitive data",
+                    "To provide antivirus protection"
+                ],
+                correct: 1,
+                trick: "SIEM stands for Security Information and Event Management, focusing on analyzing security events."
+            },
+            {
+                question: "Which type of malware is designed to replicate itself and spread to other systems?",
+                options: [
+                    "Trojan",
+                    "Virus",
+                    "Spyware",
+                    "Adware"
+                ],
+                correct: 1,
+                trick: "Viruses are malware that replicate and spread to other systems."
+            },
+            {
+                question: "What is the purpose of a DMZ in network security?",
+                options: [
+                    "To store sensitive internal data",
+                    "To act as a buffer zone between the internal network and the internet",
+                    "To provide wireless access",
+                    "To manage user authentication"
+                ],
+                correct: 1,
+                trick: "DMZ stands for Demilitarized Zone, serving as a buffer between internal networks and the internet."
+            },
+            {
+                question: "Which of the following is an example of a physical security control?",
+                options: [
+                    "Firewalls",
+                    "Biometric scanners",
+                    "Antivirus software",
+                    "Encryption"
+                ],
+                correct: 1,
+                trick: "Biometric scanners are physical controls that secure access to physical locations."
+            },
+            {
+                question: "What does the CIA triad stand for in information security?",
+                options: [
+                    "Confidentiality, Integrity, Availability",
+                    "Confidentiality, Inaccessibility, Authorization",
+                    "Control, Integrity, Availability",
+                    "Confidentiality, Identification, Authentication"
+                ],
+                correct: 0,
+                trick: "CIA triad stands for Confidentiality, Integrity, and Availability."
+            },
+            {
+                question: "Which protocol is used for securely transferring files over SSH?",
+                options: [
+                    "FTP",
+                    "SFTP",
+                    "HTTP",
+                    "SMTP"
+                ],
+                correct: 1,
+                trick: "SFTP stands for Secure File Transfer Protocol, used over SSH."
+            },
+            {
+                question: "What is the main difference between IDS and IPS?",
+                options: [
+                    "IDS is proactive, IPS is reactive",
+                    "IDS detects threats, IPS detects and prevents threats",
+                    "IDS encrypts data, IPS decrypts data",
+                    "There is no difference"
+                ],
+                correct: 1,
+                trick: "IDS detects threats, while IPS (Intrusion Prevention System) both detects and prevents them."
+            },
+            {
+                question: "Which access control model uses roles to determine access permissions?",
+                options: [
+                    "Discretionary Access Control (DAC)",
+                    "Mandatory Access Control (MAC)",
+                    "Role-Based Access Control (RBAC)",
+                    "Attribute-Based Access Control (ABAC)"
+                ],
+                correct: 2,
+                trick: "RBAC stands for Role-Based Access Control, using roles to assign permissions."
+            },
+            {
+                question: "What is the purpose of hashing in security?",
+                options: [
+                    "To encrypt data",
+                    "To ensure data integrity",
+                    "To authenticate users",
+                    "To manage permissions"
+                ],
+                correct: 1,
+                trick: "Hashing ensures data integrity by producing a unique hash value for data."
+            },
+            {
+                question: "Which wireless security protocol is considered the most secure?",
+                options: [
+                    "WEP",
+                    "WPA",
+                    "WPA2",
+                    "WPA3"
+                ],
+                correct: 3,
+                trick: "WPA3 is the latest and most secure wireless security protocol."
+            },
+            {
+                question: "What is social engineering in the context of cybersecurity?",
+                options: [
+                    "Using software to attack systems",
+                    "Manipulating people into divulging confidential information",
+                    "Encrypting sensitive data",
+                ],
+                correct: 1,
+                trick: "Social engineering involves manipulating individuals into providing confidential information."
+            },
+            {
+                question: "Which of the following is a type of physical access control?",
+                options: [
+                    "Firewalls",
+                    "Locks and keys",
+                    "Antivirus software",
+                    "Encryption"
+                ],
+                correct: 1,
+                trick: "Locks and keys are physical controls that restrict access to physical spaces."
+            },
+            {
+                question: "What is the purpose of penetration testing?",
+                options: [
+                    "To develop new security protocols",
+                    "To simulate cyberattacks and identify vulnerabilities",
+                    "To encrypt data",
+                    "To manage user access"
+                ],
+                correct: 1,
+                trick: "Penetration testing simulates cyberattacks to identify and fix vulnerabilities."
+            },
+            {
+                question: "Which type of malware is designed to secretly monitor and record user activities?",
+                options: [
+                    "Adware",
+                    "Spyware",
+                    "Ransomware",
+                    "Botnet"
+                ],
+                correct: 1,
+                trick: "Spyware secretly monitors and records user activities without their knowledge."
+            },
+            {
+                question: "What is the main function of a proxy server?",
+                options: [
+                    "To store data backups",
+                    "To act as an intermediary between a user and the internet",
+                    "To encrypt data",
+                    "To manage user permissions"
+                ],
+                correct: 1,
+                trick: "A proxy server acts as an intermediary, forwarding requests between users and the internet."
+            },
+            {
+                question: "Which security principle states that users should have access only to the information they need to perform their jobs?",
+                options: [
+                    "Least Privilege",
+                    "Separation of Duties",
+                    "Need to Know",
+                    "Defense in Depth"
+                ],
+                correct: 2,
+                trick: "Need to Know ensures users access only the information necessary for their roles."
+            },
+            {
+                question: "What is the purpose of data classification in security?",
+                options: [
+                    "To encrypt all data",
+                    "To categorize data based on its sensitivity",
+                    "To delete unnecessary data",
+                    "To share data freely"
+                ],
+                correct: 1,
+                trick: "Data classification categorizes data based on sensitivity to apply appropriate security measures."
+            },
+            {
+                question: "Which of the following is an example of a biometric authentication method?",
+                options: [
+                    "Password",
+                    "Fingerprint scan",
+                    "Security token",
+                    "Smart card"
+                ],
+                correct: 1,
+                trick: "Fingerprint scans are biometric methods that use physical characteristics for authentication."
+            },
+            {
+                question: "What is a zero-day vulnerability?",
+                options: [
+                    "A vulnerability that has been patched",
+                    "A vulnerability that is known but not yet patched",
+                    "A vulnerability that is unknown to attackers",
+                    "A vulnerability that is only theoretical"
+                ],
+                correct: 1,
+                trick: "Zero-day vulnerabilities are known vulnerabilities that haven't been patched yet."
+            },
+            {
+                question: "Which framework is commonly used for managing information security?",
+                options: [
+                    "COBIT",
+                    "ITIL",
+                    "NIST Cybersecurity Framework",
+                    "Agile"
+                ],
+                correct: 2,
+                trick: "The NIST Cybersecurity Framework is widely used for managing and improving information security."
+            },
+            {
+                question: "What does DLP stand for and what is its purpose?",
+                options: [
+                    "Data Loss Prevention - To prevent unauthorized data exfiltration",
+                    "Dynamic Link Protocol - To manage network links",
+                    "Data Link Protocol - To handle data transmission",
+                    "Distributed Learning Platform - For training purposes"
+                ],
+                correct: 0,
+                trick: "DLP stands for Data Loss Prevention, aimed at preventing unauthorized data exfiltration."
+            },
+            {
+                question: "Which type of backup includes all files that have changed since the last full backup?",
+                options: [
+                    "Full Backup",
+                    "Incremental Backup",
+                    "Differential Backup",
+                    "Mirror Backup"
+                ],
+                correct: 2,
+                trick: "Differential backups include all changes since the last full backup."
+            },
+            {
+                question: "What is the purpose of encryption in data security?",
+                options: [
+                    "To ensure data integrity",
+                    "To make data unreadable without a key",
+                    "To backup data",
+                    "To manage user access"
+                ],
+                correct: 1,
+                trick: "Encryption transforms data into an unreadable format without the appropriate decryption key."
+            },
+            {
+                question: "Which of the following is an example of a strong authentication factor?",
+                options: [
+                    "Password",
+                    "Security question",
+                    "One-Time Password (OTP)",
+                    "Username"
+                ],
+                correct: 2,
+                trick: "One-Time Passwords (OTPs) provide strong, temporary authentication factors."
+            },
+            {
+                question: "What is the main goal of disaster recovery planning?",
+                options: [
+                    "To prevent all cyberattacks",
+                    "To ensure business continuity after a disaster",
+                    "To encrypt sensitive data",
+                    "To manage user access"
+                ],
+                correct: 1,
+                trick: "Disaster recovery planning ensures business continuity and recovery after disruptive events."
+            },
+            {
+                question: "Which type of testing involves simulating an attack on your own system to find vulnerabilities?",
+                options: [
+                    "Black Box Testing",
+                    "White Box Testing",
+                    "Gray Box Testing",
+                    "Penetration Testing"
+                ],
+                correct: 3,
+                trick: "Penetration Testing simulates attacks to identify and fix system vulnerabilities."
+            },
+            {
+                question: "What is the function of a honeypot in network security?",
+                options: [
+                    "To trap and analyze attackers",
+                    "To encrypt data",
+                    "To manage user permissions",
+                    "To store backups"
+                ],
+                correct: 0,
+                trick: "A honeypot traps attackers to study their behavior and identify vulnerabilities."
+            },
+            {
+                question: "Which compliance standard is specifically designed for the healthcare industry?",
+                options: [
+                    "PCI DSS",
+                    "HIPAA",
+                    "GDPR",
+                    "SOX"
+                ],
+                correct: 1,
+                trick: "HIPAA is designed to protect sensitive patient health information in the healthcare industry."
+            },
+            {
+                question: "What is the purpose of network segmentation?",
+                options: [
+                    "To increase network speed",
+                    "To divide a network into smaller parts for improved security and performance",
+                    "To simplify network architecture",
+                    "To reduce the number of devices on the network"
+                ],
+                correct: 1,
+                trick: "Network segmentation divides the network into smaller parts, enhancing security and performance."
+            },
+            {
+                question: "Which tool is commonly used for network scanning and reconnaissance?",
+                options: [
+                    "Wireshark",
+                    "Nmap",
+                    "Metasploit",
+                    "Snort"
+                ],
+                correct: 1,
+                trick: "Nmap is widely used for network scanning and reconnaissance to discover devices and services."
+            },
+            {
+                question: "What is the purpose of patch management?",
+                options: [
+                    "To install new hardware",
+                    "To update software to fix vulnerabilities",
+                    "To manage user access",
+                    "To encrypt data"
+                ],
+                correct: 1,
+                trick: "Patch management involves updating software to fix known vulnerabilities and improve security."
+            },
+            {
+                question: "Which type of firewall filters traffic based on application-level data?",
+                options: [
+                    "Packet Filtering Firewall",
+                    "Stateful Inspection Firewall",
+                    "Proxy Firewall",
+                    "Next-Generation Firewall (NGFW)"
+                ],
+                correct: 3,
+                trick: "Next-Generation Firewalls (NGFW) filter traffic based on application-level data and advanced criteria."
+            },
+            {
+                question: "What is the main characteristic of ransomware?",
+                options: [
+                    "Stealing data silently",
+                    "Encrypting data and demanding payment for decryption",
+                    "Displaying unwanted advertisements",
+                    "Monitoring user activities"
+                ],
+                correct: 1,
+                trick: "Ransomware encrypts data and demands payment for its decryption."
+            },
+            {
+                question: "Which security principle involves multiple layers of defense to protect information?",
+                options: [
+                    "Single Point of Failure",
+                    "Defense in Depth",
+                    "Fail-Safe Defaults",
+                    "Economy of Mechanism"
+                ],
+                correct: 1,
+                trick: "Defense in Depth uses multiple layers of security to protect information."
+            },
+            {
+                question: "What is the role of a Certificate Authority (CA) in PKI?",
+                options: [
+                    "To issue and manage digital certificates",
+                    "To encrypt data",
+                    "To manage user access",
+                    "To store backup data"
+                ],
+                correct: 0,
+                trick: "A Certificate Authority (CA) issues and manages digital certificates in a Public Key Infrastructure (PKI)."
+            },
+            {
+                question: "Which of the following is an example of an asymmetric encryption algorithm?",
+                options: [
+                    "AES",
+                    "DES",
+                    "RSA",
+                    "Blowfish"
+                ],
+                correct: 2,
+                trick: "RSA is an asymmetric encryption algorithm using a pair of keys."
+            },
+            {
+                question: "What is the primary function of an antivirus program?",
+                options: [
+                    "To prevent unauthorized access",
+                    "To detect and remove malware",
+                    "To encrypt data",
+                    "To manage user permissions"
+                ],
+                correct: 1,
+                trick: "Antivirus programs detect and remove malware from systems."
+            },
+            {
+                question: "Which type of backup strategy backs up all data, then only the data that has changed since the last backup?",
+                options: [
+                    "Full Backup",
+                    "Incremental Backup",
+                    "Differential Backup",
+                    "Mirror Backup"
+                ],
+                correct: 2,
+                trick: "Differential backups include all changes since the last full backup."
+            },
+            {
+                question: "What is a sandbox in cybersecurity?",
+                options: [
+                    "A secure environment for testing untrusted applications",
+                    "A type of firewall",
+                    "A data encryption method",
+                    "A user authentication method"
+                ],
+                correct: 0,
+                trick: "A sandbox provides a secure environment to test untrusted applications without affecting the main system."
+            },
+            {
+                question: "Which security control is designed to prevent security incidents?",
+                options: [
+                    "Detective Controls",
+                    "Corrective Controls",
+                    "Preventive Controls",
+                    "Compensating Controls"
+                ],
+                correct: 2,
+                trick: "Preventive controls are designed to stop security incidents from occurring."
+            },
+            {
+                question: "What is the function of a digital signature?",
+                options: [
+                    "To encrypt data",
+                    "To verify the authenticity and integrity of a message",
+                    "To manage user access",
+                    "To store data securely"
+                ],
+                correct: 1,
+                trick: "Digital signatures verify the authenticity and integrity of digital messages or documents."
+            },
+            {
+                question: "Which of the following is a secure method for storing passwords?",
+                options: [
+                    "Plain text",
+                    "Encrypted with AES",
+                    "Hashed with a salt",
+                    "Reversed string"
+                ],
+                correct: 2,
+                trick: "Hashing passwords with a salt adds security by making them unique and hard to reverse."
+            },
+            {
+                question: "What is the purpose of a Business Continuity Plan (BCP)?",
+                options: [
+                    "To encrypt sensitive data",
+                    "To outline procedures for maintaining operations during a disaster",
+                    "To manage user access",
+                    "To detect intrusions"
+                ],
+                correct: 1,
+                trick: "A BCP outlines procedures to maintain business operations during and after a disaster."
+            },
+            {
+                question: "Which of the following is an example of a network-based attack?",
+                options: [
+                    "Phishing email",
+                    "SQL Injection",
+                    "Man-in-the-middle attack",
+                    "Shoulder surfing"
+                ],
+                correct: 2,
+                trick: "Man-in-the-middle attacks occur over networks, intercepting communications between parties."
+            },
+            {
+                question: "What is the main purpose of a security audit?",
+                options: [
+                    "To encrypt data",
+                    "To evaluate the effectiveness of security policies and controls",
+                    "To manage user access",
+                    "To develop new software"
+                ],
+                correct: 1,
+                trick: "Security audits evaluate the effectiveness and compliance of security policies and controls."
+            },
+            {
+                question: "Which type of malware demands payment to restore access to data?",
+                options: [
+                    "Spyware",
+                    "Ransomware",
+                    "Adware",
+                    "Rootkit"
+                ],
+                correct: 1,
+                trick: "Ransomware encrypts data and demands payment for its restoration."
+            },
+            {
+                question: "What does SSL/TLS provide for internet communications?",
+                options: [
+                    "Data integrity",
+                    "Data encryption and secure transmission",
+                    "User authentication",
+                    "Access control"
+                ],
+                correct: 1,
+                trick: "SSL/TLS encrypts data, ensuring secure transmission over the internet."
+            },
+            {
+                question: "Which term describes unauthorized access to a system by bypassing authentication?",
+                options: [
+                    "Phishing",
+                    "Brute Force",
+                    "Backdoor",
+                    "Spoofing"
+                ],
+                correct: 2,
+                trick: "A backdoor bypasses regular authentication methods for unauthorized system access."
+            },
+            {
+                question: "What is the main advantage of using cloud services for data storage?",
+                options: [
+                    "Unlimited storage capacity",
+                    "Enhanced physical security",
+                    "Scalability and flexibility",
+                    "Complete control over data centers"
+                ],
+                correct: 2,
+                trick: "Cloud services offer scalability and flexibility, allowing storage resources to adjust based on needs."
+            }
+        ];
+
+        // Shuffle the quizData array to randomize question order
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const quiz = {
+            questions: shuffle(quizData),
+            currentQuestion: 0,
+            score: 0,
+            selectedOption: null
+        };
+
+        // DOM Elements
+        const quizElement = document.getElementById('quiz');
+        const resultElement = document.getElementById('result');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const progressTextElement = document.getElementById('progress-text');
+        const progressBarElement = document.getElementById('progress-bar');
+        const submitButton = document.getElementById('submit');
+        const nextButton = document.getElementById('next');
+        const showTrickButton = document.getElementById('showTrick');
+        const memoryTrickElement = document.getElementById('memoryTrick');
+        const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('highScore');
+        const restartButton = document.getElementById('restart');
+
+        // Initialize High Score from Local Storage
+        let highScore = JSON.parse(localStorage.getItem('highScore')) || {score: 0, percentage: 0};
+        highScoreElement.textContent = `Highest Score: ${highScore.score}/35 (${highScore.percentage}%)`;
+
+        function showQuestion() {
+            const current = quiz.questions[quiz.currentQuestion];
+            progressTextElement.textContent = `Question ${quiz.currentQuestion + 1} of ${quiz.questions.length}`;
+            progressBarElement.style.width = `${((quiz.currentQuestion) / quiz.questions.length) * 100}%`;
+            questionElement.textContent = current.question;
+            
+            // Clear previous options
+            optionsElement.innerHTML = '';
+            memoryTrickElement.style.display = 'none';
+            memoryTrickElement.textContent = '';
+
+            // Add new options
+            current.options.forEach((option, index) => {
+                const li = document.createElement('li');
+                li.className = 'option';
+                li.textContent = option;
+                li.dataset.index = index;
+                li.onclick = () => selectOption(li, index);
+                optionsElement.appendChild(li);
+            });
+
+            // Reset buttons
+            submitButton.style.display = 'block';
+            nextButton.style.display = 'none';
+            showTrickButton.style.display = 'none';
+            quiz.selectedOption = null;
+        }
+
+        function selectOption(element, index) {
+            // Deselect all options
+            const allOptions = document.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+
+            // Select the clicked option
+            element.classList.add('selected');
+            quiz.selectedOption = index;
+        }
+
+        function checkAnswer() {
+            if (quiz.selectedOption === null) {
+                alert('Please select an answer before submitting.');
+                return;
+            }
+
+            const current = quiz.questions[quiz.currentQuestion];
+            const allOptions = document.querySelectorAll('.option');
+
+            // Highlight correct and incorrect answers
+            allOptions.forEach(opt => {
+                const optIndex = parseInt(opt.dataset.index);
+                if (optIndex === current.correct) {
+                    opt.classList.add('correct');
+                }
+                if (optIndex === quiz.selectedOption && quiz.selectedOption !== current.correct) {
+                    opt.classList.add('incorrect');
+                }
+                // Disable further clicking
+                opt.style.pointerEvents = 'none';
+            });
+
+            // Update score if correct
+            if (quiz.selectedOption === current.correct) {
+                quiz.score++;
+            }
+
+            // Update progress bar
+            progressBarElement.style.width = `${((quiz.currentQuestion + 1) / quiz.questions.length) * 100}%`;
+
+            // Show next and showTrick buttons
+            submitButton.style.display = 'none';
+            nextButton.style.display = 'inline-block';
+            showTrickButton.style.display = 'inline-block';
+        }
+
+        function showMemoryTrick() {
+            const current = quiz.questions[quiz.currentQuestion];
+            memoryTrickElement.textContent = `🧠 Memory Trick: ${current.trick}`;
+            memoryTrickElement.style.display = 'block';
+        }
+
+        function showResult() {
+            quizElement.style.display = 'none';
+            resultElement.style.display = 'block';
+            const percentage = ((quiz.score / quiz.questions.length) * 100).toFixed(1);
+            scoreElement.textContent = `Your Score: ${quiz.score}/${quiz.questions.length} (${percentage}%)`;
+
+            // Update high score if current score is higher
+            if (quiz.score > highScore.score) {
+                highScore = {score: quiz.score, percentage};
+                localStorage.setItem('highScore', JSON.stringify(highScore));
+                highScoreElement.textContent = `Highest Score: ${highScore.score}/35 (${highScore.percentage}%)`;
+                alert('Congratulations! You achieved a new high score!');
+            }
+        }
+
+        // Event Listeners
+        submitButton.addEventListener('click', checkAnswer);
+        nextButton.addEventListener('click', () => {
+            quiz.currentQuestion++;
+            if (quiz.currentQuestion < quiz.questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        });
+        showTrickButton.addEventListener('click', showMemoryTrick);
+        restartButton.addEventListener('click', () => {
+            // Reset quiz
+            quiz.currentQuestion = 0;
+            quiz.score = 0;
+            quiz.selectedOption = null;
+            // Reshuffle questions
+            quiz.questions = shuffle(quizData);
+            // Reset UI
+            resultElement.style.display = 'none';
+            quizElement.style.display = 'block';
+            highScoreElement.textContent = `Highest Score: ${highScore.score}/35 (${highScore.percentage}%)`;
+            showQuestion();
+        });
+
+        // Start the quiz
+        showQuestion();
+    </script>
+</body>
+</html>
